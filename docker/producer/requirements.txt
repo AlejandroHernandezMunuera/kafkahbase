@@ -1,0 +1,5 @@
+numpy
+apache_beam
+beam_nuggets
+kafka-python
+

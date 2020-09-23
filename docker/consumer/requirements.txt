@@ -1,0 +1,7 @@
+apache_beam
+beam_nuggets
+kafka-python
+scikit-learn
+nltk
+happybase
+joblib

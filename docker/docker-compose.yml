@@ -1,0 +1,62 @@
+version: '3'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+    - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_CREATE_TOPICS: mail:3:1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  hbase:
+    image: kevinsvds/hbase
+    container_name: hbase
+    hostname: hbase
+    ports:
+      - "9090:9090"
+      - "9095:9095"
+      - "60000:60000"
+      - "60010:60010"
+      - "60020:60020"
+      - "60030:60030"
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper
+
+  producer:
+    build:
+      context: ./
+      dockerfile: ./producer/Dockerfile
+    container_name: producer
+    hostname: producer
+    depends_on:
+      - kafka
+    links:
+      - kafka
+      
+  consumer:
+    build:
+      context: ./
+      dockerfile: ./consumer/Dockerfile
+    container_name: consumer
+    hostname: consumer
+    depends_on:
+      - kafka
+      - hbase
+    links:
+      - kafka
+      - hbase
